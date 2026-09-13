@@ -108,3 +108,18 @@ Open [http://localhost:3000](http://localhost:3000).
 The app uses a YOLOv8m model trained on real aircraft damage photos (crack, corrosion, dent, surface_damage, fastener_damage classes). Training was run on Kaggle's free T4 GPU — see `training/train.ipynb` for the full pipeline (dataset download via Roboflow, merging, augmentation, training, evaluation).
 
 To use your own trained weights, drop a `best.pt` file into `backend/models/`. If absent, the backend automatically falls back to an OpenRouter vision model (`nvidia/nemotron-nano-12b-v2-vl:free`) so the app still works without local inference.
+
+### Current status of the trained model
+
+The trained `best.pt` is 155 MB and is **not in this repository**; `*.pt` is gitignored. A fresh clone runs on the OpenRouter fallback until you train with `training/train.ipynb` or supply weights.
+
+Checked against the local weights on 2026-09-13:
+
+| Check | Result |
+|---|---|
+| Weights load | yes, YOLOv8 detection model, the five classes above |
+| Inference on CPU | 0.5 to 0.7 s per image |
+| `sample_images/corroded_bolt.jpg` | detected as **crack**, confidence 0.40 |
+| `sample_images/corroded_steel_paint.jpg` | detected as **crack**, confidence 0.46 |
+
+Both sample photos show corrosion, and the model labels both as cracks with low confidence. Because `yolo_service.py` rates any crack or corrosion as critical regardless of confidence, both come back **grounded**. The class confusion points to too few corrosion examples in the merged training data; retraining with more of them, and checking per-class precision and recall on the validation split, is the next step before trusting a verdict.
