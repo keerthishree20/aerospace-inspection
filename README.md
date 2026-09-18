@@ -107,7 +107,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 The app uses a YOLOv8m model trained on real aircraft damage photos (crack, corrosion, dent, surface_damage, fastener_damage classes). Training was run on Kaggle's free T4 GPU — see `training/train.ipynb` for the full pipeline (dataset download via Roboflow, merging, augmentation, training, evaluation).
 
-To use your own trained weights, drop a `best.pt` file into `backend/models/`. If absent, the backend automatically falls back to an OpenRouter vision model (`nvidia/nemotron-nano-12b-v2-vl:free`) so the app still works without local inference.
+To use your own trained weights, drop a `best.pt` file into `backend/models/`. If absent, the backend automatically falls back to OpenRouter vision models so the app still works without local inference. It tries an ordered list of free models from `OPENROUTER_MODELS` (default `qwen/qwen3.8-27b:free`, `inclusionai/ling-3.0-flash-vl:free`, `google/gemma-4-31b-it:free`), moving on when one is rate-limited. The original `nvidia/nemotron-nano-12b-v2-vl:free` was withdrawn from OpenRouter, which broke the fallback and the chat assistant until 2026-09-18.
 
 ### Current status of the trained model
 

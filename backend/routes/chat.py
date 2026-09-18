@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from database import get_db
 from models.inspection import Inspection
+from services.gemini_service import FALLBACK, OPENROUTER_MODEL
 from openai import AsyncOpenAI
 import os
 from dotenv import load_dotenv
@@ -58,7 +59,8 @@ Keep responses concise (2-4 sentences). If asked about safety, always prioritize
     messages.append({"role": "user", "content": req.message})
 
     response = await client.chat.completions.create(
-        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        model=OPENROUTER_MODEL,
+        extra_body=FALLBACK,
         messages=messages,
     )
 

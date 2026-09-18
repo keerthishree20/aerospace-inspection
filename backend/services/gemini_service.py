@@ -14,6 +14,24 @@ client = AsyncOpenAI(
     api_key=os.getenv("OPENROUTER_API_KEY"),
 )
 
+# The original nvidia/nemotron-nano-12b-v2-vl:free was withdrawn from
+# OpenRouter, which broke the fallback inspection and the chat assistant. Free
+# models come and go and their shared pools are often rate-limited, so this is
+# an ordered list: OpenRouter tries the next model when one is busy or gone.
+# Every model listed must accept images.
+OPENROUTER_MODELS = [
+    m.strip()
+    for m in os.getenv(
+        "OPENROUTER_MODELS",
+        "qwen/qwen3.8-27b:free,inclusionai/ling-3.0-flash-vl:free,google/gemma-4-31b-it:free",
+    ).split(",")
+    if m.strip()
+]
+OPENROUTER_MODEL = OPENROUTER_MODELS[0]
+# OpenRouter's fallback routing: the request names the first model and lists
+# the rest in `models`.
+FALLBACK = {"models": OPENROUTER_MODELS} if len(OPENROUTER_MODELS) > 1 else {}
+
 INSPECTION_PROMPT = """
 You are an expert aerospace MRO (Maintenance, Repair, Overhaul) engineer analyzing an aircraft component image.
 
@@ -48,7 +66,8 @@ async def analyze_image(image_bytes: bytes) -> dict:
     mime = f"image/{fmt.lower()}"
 
     response = await client.chat.completions.create(
-        model="nvidia/nemotron-nano-12b-v2-vl:free",
+        model=OPENROUTER_MODEL,
+        extra_body=FALLBACK,
         messages=[
             {
                 "role": "user",

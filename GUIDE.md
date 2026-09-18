@@ -117,8 +117,12 @@ bounding box's area.
   SQLite  aerospace.db   (SQLAlchemy async)
 ```
 
-`services/gemini_service.py` is named for the original plan to use Gemini. It now calls OpenRouter
-with the model `nvidia/nemotron-nano-12b-v2-vl:free`.
+`services/gemini_service.py` is named for the original plan to use Gemini. It calls OpenRouter with
+an ordered list of free vision models from `OPENROUTER_MODELS`, by default
+`qwen/qwen3.8-27b:free`, then `inclusionai/ling-3.0-flash-vl:free`, then
+`google/gemma-4-31b-it:free`. OpenRouter moves to the next one when a model is rate-limited or gone.
+The original `nvidia/nemotron-nano-12b-v2-vl:free` was withdrawn, which broke chat and the fallback
+inspection until 2026-09-18.
 
 ---
 
@@ -213,9 +217,24 @@ To retrain:
   the model says crack with confidence around 0.4 to 0.5. Because cracks are always critical, both
   come back grounded. The likely cause is too few corrosion examples. Retrain with more, and check
   per-class precision and recall before trusting a verdict.
-- **No tests.** Behaviour has been checked by hand only.
+- **Retraining needs a GPU and your Kaggle and Roboflow accounts**, so it cannot be done from the
+  code alone. Until then, the OpenRouter fallback identified the corroded bolt sample as corrosion in
+  live checks on 2026-09-18. To use it instead of the weights, move `backend/models/best.pt` aside.
+- **Fallback verdicts vary between runs.** Two live runs on the same photo returned medium, then
+  critical, severity. A language model is not deterministic, so treat its severity as advisory.
 - **The chat assistant needs an OpenRouter key** even when local detection is used.
 - **Not deployed.**
+
+### Tests
+`backend/tests/` has 24 tests: the severity and compliance rules, every comparison verdict, and the
+inspect, stats, compare and chat routes with the image analysis and chat model stubbed. No key, no
+network, no model weights:
+
+```bash
+cd backend
+venv/bin/pip install -r requirements-dev.txt
+venv/bin/python -m pytest
+```
 
 ---
 
