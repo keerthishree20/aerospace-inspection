@@ -8,6 +8,7 @@ into any AI chat and ask questions about the project without sharing the reposit
 building, running, understanding and changing the code.
 
 **Repository:** https://github.com/keerthishree20/aerospace-inspection
+**All projects:** https://github.com/keerthishree20
 
 ---
 
