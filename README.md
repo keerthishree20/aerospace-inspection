@@ -1,5 +1,7 @@
 # AeroInspect — Edge AI for Intelligent Aircraft Inspection
 
+[![tests](https://github.com/keerthishree20/aerospace-inspection/actions/workflows/tests.yml/badge.svg)](https://github.com/keerthishree20/aerospace-inspection/actions/workflows/tests.yml)
+
 AI-powered aircraft component inspection platform that detects structural defects (cracks, corrosion, dents, surface damage, fastener damage) from photos using a custom-trained YOLOv8 model, and assesses airworthiness compliance automatically.
 
 Built for the **Edge AI for Intelligent Inspection & Defect Detection** hackathon category.
