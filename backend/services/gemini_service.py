@@ -9,9 +9,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# The client is built at import, so a missing key must not raise here: the
+# local YOLO path needs no key at all, and the OpenRouter calls report their
+# own failure at request time. Without the placeholder, importing the app
+# (or running the tests) fails outright when OPENROUTER_API_KEY is unset.
 client = AsyncOpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPENROUTER_API_KEY"),
+    api_key=os.getenv("OPENROUTER_API_KEY") or "OPENROUTER_API_KEY-not-set",
 )
 
 # The original nvidia/nemotron-nano-12b-v2-vl:free was withdrawn from
